@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools", "wheel", "setuptools_scm[toml]"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "src/maya_tools/_version.py"
+
+[tool.black]
+line-length = 79
+
+[tool.isort]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "APPLICATION", "FIRSTPARTY", "LOCALFOLDER"]
+known_third_party = ["PySide2", "shiboken2", "yaml", "six", "webcolors"]
+known_application=["maya"]
+profile = "black"
+line_length = 79

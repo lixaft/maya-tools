@@ -1,0 +1,15 @@
+*.egg-info/
+*.py[cod]
+*.swp
+*_version.py
+.DS_Store
+.coverage
+.mypy_cache/
+.pytest_cache/
+.vscode/
+[Dd]esktop.ini
+__pycache__/
+build/
+dist/
+htmlcov/
+venv/
