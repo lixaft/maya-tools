@@ -167,4 +167,4 @@ def as_mesh(name):
     Returns:
         OpenMaya.MFnMesh: The converted instance of the name.
     """
-    return OpenMaya.MFnMesh(as_object(name))
+    return OpenMaya.MFnMesh(as_path(name).extendToShape().node())

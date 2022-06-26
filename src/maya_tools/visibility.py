@@ -22,6 +22,13 @@ def is_visible(node):
         >>> is_visible(b)
         False
 
+        By turning on the visibility of the parent of the node, it will become
+        visible inside the viewport and this function will return True:
+
+        >>> cmds.setAttr(a + ".visibility", True)
+        >>> is_visible(b)
+        True
+
     Arguments:
         node (str): The node to check.
 

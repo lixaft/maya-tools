@@ -11,6 +11,14 @@ LOG = logging.getLogger(__name__)
 def proximity(driver, driven, falloff=1.0):
     """Create a proximity wrap between two nodes.
 
+    Examples:
+        >>> from maya import cmds
+        >>> _ = cmds.file(new=True, force=True)
+        >>> a = cmds.polySphere()[0]
+        >>> b = cmds.polySphere()[0]
+        >>> proximity(a, b)
+        'proximityWrap1'
+
     Arguments:
         driver (str): Name of driver mesh.
         targets (list): List of driven meshes.

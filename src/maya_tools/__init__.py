@@ -27,20 +27,18 @@ def all_modules():
     import maya_tools.history
     import maya_tools.io
     import maya_tools.joint
-    import maya_tools.layer
     import maya_tools.mesh
     import maya_tools.name
+    import maya_tools.nodeeditor
     import maya_tools.offset
     import maya_tools.performance
     import maya_tools.plugin
     import maya_tools.reference
-    import maya_tools.rivet
     import maya_tools.search
     import maya_tools.selection
-    import maya_tools.shader
     import maya_tools.shape
     import maya_tools.skincluster
-    import maya_tools.transform
+    import maya_tools.ui
     import maya_tools.visibility
     import maya_tools.wrap
 
@@ -60,20 +58,18 @@ def all_modules():
         maya_tools.history,
         maya_tools.io,
         maya_tools.joint,
-        maya_tools.layer,
         maya_tools.mesh,
         maya_tools.name,
+        maya_tools.nodeeditor,
         maya_tools.offset,
         maya_tools.performance,
         maya_tools.plugin,
         maya_tools.reference,
-        maya_tools.rivet,
         maya_tools.search,
         maya_tools.selection,
-        maya_tools.shader,
         maya_tools.shape,
         maya_tools.skincluster,
-        maya_tools.transform,
+        maya_tools.ui,
         maya_tools.visibility,
         maya_tools.wrap,
         sys.modules[__name__],

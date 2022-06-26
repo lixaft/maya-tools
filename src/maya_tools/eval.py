@@ -2,10 +2,12 @@
 import logging
 from typing import Any, Callable, Iterable
 
+__all__ = ["exec_string"]
+
 LOG = logging.getLogger(__name__)
 
 
-def from_string(code, language="python", decorators=None):
+def exec_string(code, language="python", decorators=None):
     # type: (str, str, Iterable[Callable]) -> Any
     """Execute a string as python code.
 
