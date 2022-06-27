@@ -8,11 +8,13 @@ from maya import cmds
 from maya.api import OpenMaya
 
 __all__ = [
-    "get_points",
-    "get_cached",
-    "set_cached",
     "from_points",
     "from_transforms",
+    "get_cached",
+    "get_points",
+    "replace",
+    "set_cached",
+    "transform",
 ]
 
 LOG = logging.getLogger(__name__)
@@ -300,12 +302,11 @@ def transform(
         scale: The scale to apply on the shape.
         space: The space on which the transformation should be applied.
     """
-    cvs = curve + ".cv[*]"
-
     flags = {}
     flags["relative"] = True
     flags[space + "Space"] = True
 
+    cvs = curve + ".cv[*]"
     if translate != (0, 0, 0):
         cmds.move(translate[0], translate[1], translate[2], cvs, **flags)
     if rotate != (0, 0, 0):
