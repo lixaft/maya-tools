@@ -300,13 +300,15 @@ def transform(
         scale: The scale to apply on the shape.
         space: The space on which the transformation should be applied.
     """
+    cvs = curve + ".cv[*]"
+
     flags = {}
     flags["relative"] = True
     flags[space + "Space"] = True
 
     if translate != (0, 0, 0):
-        cmds.move(translate[0], translate[1], translate[2], curve, **flags)
+        cmds.move(translate[0], translate[1], translate[2], cvs, **flags)
     if rotate != (0, 0, 0):
-        cmds.rotate(rotate[0], rotate[1], rotate[2], curve, **flags)
+        cmds.rotate(rotate[0], rotate[1], rotate[2], cvs, **flags)
     if scale != (1, 1, 1):
-        cmds.scale(scale[0], scale[1], scale[2], curve, **flags)
+        cmds.scale(scale[0], scale[1], scale[2], cvs, **flags)
