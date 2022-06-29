@@ -309,7 +309,7 @@ def restore(node):
 def unlock(
     node,  # type: str
     attributes=None,  # type: Optional[Sequence[str]]
-):  # type: Generator[Sequence[str], None, None]
+):  # type: (...) -> Generator[Sequence[str], None, None]
     """Temporarily unlock attributes during the execution of the block.
 
     If no attributes are specified, all the locked attributes of the node will
