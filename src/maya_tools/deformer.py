@@ -24,8 +24,7 @@ def find(node, type=None):
     for deformer in cmds.findDeformers(node):
         if type is not None and cmds.nodeType(deformer) != type:
             continue
-        else:
-            result.append(deformer)
+        result.append(deformer)
     return result
 
 

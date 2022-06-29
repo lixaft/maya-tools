@@ -11,7 +11,7 @@ __all__ = ["lock"]
 
 
 @contextlib.contextmanager
-def lock():
+def lock():  # pragma: no cover
     # type: () -> Generator[None, None, None]
     """Prevents adding new nodes in the Node Editor.
 

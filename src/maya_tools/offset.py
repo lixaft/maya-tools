@@ -11,7 +11,6 @@ __all__ = [
     "group",
     "inverse_group",
     "matrix",
-    "matrix_to_group",
     "reset_matrix",
     "unmatrix",
 ]

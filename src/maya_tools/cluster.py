@@ -8,9 +8,9 @@ __all__ = ["create"]
 LOG = logging.getLogger(__name__)
 
 
-def create(obj, name=None):
+def create(geometry, name="cluster"):
     # type: (str, str) -> str
-    """Create a new cluster.
+    """Create a new cluster deformer.
 
     The difference with ``cmds.cluster()`` command is that this function will
     create the cluster and give the position to the transform node instead of
@@ -22,15 +22,16 @@ def create(obj, name=None):
         >>> cube = cmds.polyCube()[0]
         >>> cluster = create(cube + ".vtx[0]")
         >>> cmds.getAttr(cluster + ".translate")[0]
+        (-0.5, -0.5, 0.5)
 
     Arguments:
-        obj: The target target that the cluster will affect.
+        geometry: The target target that the cluster will affect.
         name: The name ti give ti the cluster.
 
     Returns:
         The name of the deformer.
     """
-    old = cmds.cluster(obj)[1]
+    old = cmds.cluster(geometry)[1]
     new = cmds.createNode("transform", name=name)
     shape = cmds.listRelatives(old, shapes=True)[0]
 

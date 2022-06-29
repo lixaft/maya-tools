@@ -11,7 +11,13 @@ LOG = logging.getLogger(__name__)
 
 def make(path, node="transform"):
     # type: (str, str) -> str
-    """Create a full path in maya outliner.
+    """Create a leaf transform and all intermediate ones.
+
+    Similar to `os.makedirs`, this function will create all intermediate
+    transformations that do not exist until the specified sheet is reached.
+
+    If leaf transform already exists in the scene, no error, warning or
+    message will be displayed/raised.
 
     Examples:
         >>> from maya import cmds
@@ -24,16 +30,19 @@ def make(path, node="transform"):
         'A'
 
     Arguments:
-        path (str): The full path to create.
-        node (str): The type of node to create for the path.
+        path: The full path to create.
+        node: The node type that will be used to create the hierarchy.
 
     Returns:
-        str: The name of the tail of the path.
+        The name of the leaf transform.
     """
     nodes = path.split("|")
     for i, each in enumerate(nodes):
         if not cmds.objExists(each):
             cmds.createNode(node, name=each)
+        parents = cmds.listRelatives(each, parent=True)
+        if parents and parents[0] == nodes[i - 1]:
+            continue
         if i > 0:
             cmds.parent(each, nodes[i - 1])
     return nodes[-1]
