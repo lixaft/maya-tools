@@ -9,6 +9,7 @@ LOG = logging.getLogger(__name__)
 
 
 def proximity(driver, driven, falloff=1.0):
+    # type: (str, str, float) -> str
     """Create a proximity wrap between two nodes.
 
     Examples:
@@ -20,14 +21,14 @@ def proximity(driver, driven, falloff=1.0):
         'proximityWrap1'
 
     Arguments:
-        driver (str): Name of driver mesh.
-        targets (list): List of driven meshes.
-        falloff (float): Default value for the folloffScale attribute.
+        driver: Name of driver mesh.
+        targets: List of driven meshes.
+        falloff: Default value for the folloffScale attribute.
 
     Returns:
-        str: The name of the deformer node.
+        The name of the deformer node.
     """
-    deformer = cmds.deformer(driven, type="proximityWrap")[0]
+    deformer = cmds.deformer(driven, type="proximityWrap")[0]  # type: str
     plug = deformer + ".drivers[0]"
     orig = cmds.deformableShape(driver, originalGeometry=True)[0]
     if not orig:

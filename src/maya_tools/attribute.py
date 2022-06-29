@@ -4,7 +4,7 @@ import contextlib
 import json
 import logging
 import re
-from typing import Generator
+from typing import Any, Dict, Generator, List, Optional, Sequence, Union
 
 from maya import cmds, mel
 from maya.api import OpenMaya
@@ -43,7 +43,7 @@ SHORT_SRT = tuple(x + y for x in "srt" for y in "xyz")
 
 
 def add_separator(node, right=None, left=None, name="separator{index:02}"):
-    # type: (str, str | None, str | None, str) -> str
+    # type: (str, Optional[str], Optional[str], str) -> str
     """Add a dummy attribute in the channel box to create a visual separator.
 
     On the node, an enum attribute will be added to construct the separator.
@@ -112,7 +112,7 @@ def add_separator(node, right=None, left=None, name="separator{index:02}"):
 
 
 def copy(source, destination, values=False, attributes=None, fatal=False):
-    # type: (str, str, bool, list[str] | None, bool) -> list[str]
+    # type: (str, str, bool, Optional[List[str]], bool) -> List[str]
     """Copy the attribute(s) from the source node to the destination node.
 
     If no attributes are specified, all the user-defined attributes of the
@@ -245,7 +245,7 @@ def copy(source, destination, values=False, attributes=None, fatal=False):
 
 
 def reset(node, attributes=None):
-    # type: (str, list[str] | None) -> None
+    # type: (str, Optional[Sequence[str]]) -> None
     """Reset the given attributes to their default values.
 
     If no attributes are specified, all the user-defined attributes of the node
@@ -264,8 +264,8 @@ def reset(node, attributes=None):
         1.0
 
     Arguments:
-        node (str): The name of the node that contains the attributes to reset.
-        attributes (list, optional): Filter the attributes to copy.
+        node: The name of the node that contains the attributes to reset.
+        attributes: Filter the attributes to copy.
     """
     for attr in attributes or cmds.listAttr(node, keyable=True) or []:
         plug = "{}.{}".format(node, attr)
@@ -295,7 +295,7 @@ def restore(node):
         (0.0, 1.0, 2.0)
 
     Arguments:
-        node (str): The name of the node to restore.
+        node: The name of the node to restore.
     """
     cmds.nodePreset(save=(node, node))
     try:
@@ -306,8 +306,10 @@ def restore(node):
 
 
 @contextlib.contextmanager
-def unlock(node, attributes=None):
-    # type: (str, list[str]) -> Generator[list[str], None, None]
+def unlock(
+    node,  # type: str
+    attributes=None,  # type: Optional[Sequence[str]]
+):  # type: Generator[Sequence[str], None, None]
     """Temporarily unlock attributes during the execution of the block.
 
     If no attributes are specified, all the locked attributes of the node will
@@ -322,7 +324,7 @@ def unlock(node, attributes=None):
         >>> plug = node + ".translateX"
         >>> cmds.setAttr(plug, lock=True)
         >>> cmds.setAttr(plug, 1)
-        Traceback (most recent call last):
+        Traceback (most  # type: ignore recent call last):
           ...
         RuntimeError
         >>> with unlock(node):
@@ -331,11 +333,11 @@ def unlock(node, attributes=None):
         True
 
     Arguments:
-        node (str): The node on which the attributes should be unlocked.
-        attributes (list, optional): Filter the attributes to unlock.
+        node: The node on which the attributes should be unlocked.
+        attributes: Filter the attributes to unlock.
 
     Yields:
-        list: The name of the unlocked attributes.
+        The name of the unlocked attributes.
     """
     attributes = attributes or cmds.listAttr(node, locked=True) or []
 
@@ -349,14 +351,14 @@ def unlock(node, attributes=None):
     for plug in plugs:
         cmds.setAttr(plug, lock=False)
     try:
-        yield attributes  # type: ignore
+        yield attributes
     finally:
         for plug, value in plugs.items():
             cmds.setAttr(plug, lock=value)
 
 
 def find_used_indices(plug):
-    # type: (str) -> list[int]
+    # type: (str) -> List[int]
     """Get the index of used elements of an array attribute.
 
     An element is considered used if it is either connected or have had their
@@ -374,10 +376,10 @@ def find_used_indices(plug):
         [0, 3, 8]
 
     Arguments:
-        plug (str): The plug to analyse.
+        plug: The plug to analyse.
 
     Returns:
-        list: The used indices of the multi attribute.
+        The used indices of the multi attribute.
     """
     sel = OpenMaya.MSelectionList()
     sel.add(plug)
@@ -386,6 +388,7 @@ def find_used_indices(plug):
 
 
 def find_next_index(plug, start=0):
+    # type: (str, int) -> str
     """Find the next available index of a multi attribute.
 
     Examples:
@@ -400,18 +403,18 @@ def find_next_index(plug, start=0):
         'dst.matrixIn[1]'
 
     Arguments:
-        plug (str): The name of the multi attribute plug.
-        start (int): The index from which the search should be start.
+        plug: The name of the multi attribute plug.
+        start: The index from which the search should be start.
 
     Returns:
-        str: The next available plug of the multi attribute.
+        The next available plug of the multi attribute.
     """
     index = mel.eval("getNextFreeMultiIndex {} {}".format(plug, start))
     return "{}[{}]".format(plug, index)
 
 
 def delete_user_defined(node, attributes=None, keep_if_connected=False):
-    # type: (str, list[str] | None, bool) -> list[str]
+    # type: (str, Optional[Sequence[str]], bool) -> List[str]
     """Delete user-defined attributes on the given node.
 
     If no attributes are specified, all the user-defined attributes of the node
@@ -429,13 +432,13 @@ def delete_user_defined(node, attributes=None, keep_if_connected=False):
         ['testA', 'testC']
 
     Arguments:
-        node (str): The name of the node which contains the attributes.
-        attributes (list, optional): Filter the attributes to delete.
-        keep_if_connected (bool): Do not delete the attribute if it has an
+        node: The name of the node which contains the attributes.
+        attributes: Filter the attributes to delete.
+        keep_if_connected: Do not delete the attribute if it has an
             input connection.
 
     Returns:
-        list: The name of all the deleted attributes.
+        The name of all the deleted attributes.
     """
     deleted = []
     attributes = attributes or cmds.listAttr(node, userDefined=True) or []
@@ -455,6 +458,7 @@ def delete_user_defined(node, attributes=None, keep_if_connected=False):
 
 def move(plug, where="down"):
     # type: (str, str) -> None
+    # pylint: disable=too-many-branches
     """Move the specified attributes along the channel box.
 
     Only the user's attributes are supported by the function. For example,
@@ -478,8 +482,8 @@ def move(plug, where="down"):
         ['D', 'A', 'C', 'B']
 
     Arguments:
-        plug (str): The name of the pug to move.
-        where (str): The direction in which the plug will be moved.
+        plug: The name of the pug to move.
+        where: The direction in which the plug will be moved.
 
     Raises:
         ValueError: The specifiy direction is not supported.
@@ -487,6 +491,7 @@ def move(plug, where="down"):
     node, attribute = plug.split(".", 1)
 
     def to_last(attr):
+        # type: (str) -> None
         # Redirecting the stdout does not seem to be enough to remove the
         # `Undo:` messages. Pytest is able to remove these messages, so it
         # might be worth investigating this to improve the silent utility.
@@ -540,7 +545,7 @@ def move(plug, where="down"):
 
 
 def write_data(node, name, data, compress=False):
-    # type: (str, str, dict | list, bool) -> None
+    # type: (str, str, Union[List[Any], Dict[str, Any]], bool) -> None
     """Create a maya attribute that contains the given data.
 
     Examples:
@@ -555,10 +560,10 @@ def write_data(node, name, data, compress=False):
         >>> write_data(node, "test", data, compress=True)
 
     Arguments:
-        node (str): The name of the node on which create the attribute.
-        name (str): The name of the attribute to create.
-        data (dict or list): The data to write on the attribute.
-        compress (bool): Compress the given data before writing it to the
+        node: The name of the node on which create the attribute.
+        name: The name of the attribute to create.
+        data: The data to write on the attribute.
+        compress: Compress the given data before writing it to the
             attribute.
     """
     plug = "{}.{}".format(node, name)
@@ -566,13 +571,13 @@ def write_data(node, name, data, compress=False):
         cmds.addAttr(node, longName=name, dataType="string")
     string = str(json.dumps(data))  # type: str
     if compress:
-        string_ = bytes(string.encode("utf-8"))  # type: ignore
+        string_ = bytes(string.encode("utf-8"))
         string = str(codecs.encode(codecs.encode(string_, "zlib"), "base64"))
     cmds.setAttr(plug, string, type="string")
 
 
 def read_data(plug, compressed=False):
-    # type: (str, bool) -> dict | list
+    # type: (str, bool) -> Union[List[Any], Dict[str, Any]]
     """Read the data from an attribute.
 
     Examples:
@@ -591,14 +596,15 @@ def read_data(plug, compressed=False):
         True
 
     Arguments:
-        plug (str): The name of the plug ot read.
-        compressed (bool): Specify if the data to be read is compressed or not.
+        plug: The name of the plug ot read.
+        compressed: Specify if the data to be read is compressed or not.
 
     Returns:
-        dict or list: The python object decoded.
+        The python object decoded.
     """
     string = cmds.getAttr(plug)
     if compressed:
         string = bytes(string.encode("utf-8"))
         string = codecs.decode(codecs.decode(string, "base64"), "zlib")
-    return json.loads(string)
+    data = json.loads(string)  # type: Union[List[Any], Dict[str, Any]]
+    return data

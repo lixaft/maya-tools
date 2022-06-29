@@ -171,6 +171,7 @@ def from_transforms(
     attach=False,
 ):
     # type: (str, str, int, bool, str, bool) -> str
+    # pylint: disable=too-many-arguments
     """Create a curve with each point at the position of a transform node.
 
     If the ``attach`` parameter is set to ``True``, each point of the created

@@ -9,6 +9,7 @@ LOG = logging.getLogger(__name__)
 
 
 def is_visible(node):
+    # type: (str) -> bool
     """Check if the node is visible by querying all its ancestors.
 
     Examples:
@@ -30,10 +31,10 @@ def is_visible(node):
         True
 
     Arguments:
-        node (str): The node to check.
+        node: The node to check.
 
     Returns:
-        bool: True if the node is visible, False otherwise.
+        True if the node is visible, False otherwise.
     """
     path = cmds.ls(node, long=True)[0]
     while "|" in path:

@@ -92,7 +92,7 @@ def mirror(node, patterns=("L_:R_", "l_:r_")):
     for pattern in patterns:
         right, left = pattern.split(":")
         for current, opposite in itertools.permutations((left, right)):
-            if not current in node:
+            if current not in node:
                 continue
 
             opposite_node = node.replace(current, opposite)

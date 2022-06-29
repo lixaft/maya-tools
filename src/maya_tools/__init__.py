@@ -2,6 +2,7 @@
 """Collection of tools and utilities for Autodesk Maya."""
 import sys
 from types import ModuleType
+from typing import List
 
 __all__ = ["__version__", "__version_tuple__", "all_modules"]
 
@@ -10,7 +11,7 @@ __version_tuple__ = ("0", "1", "0")
 
 
 def all_modules():
-    # type: () -> list[ModuleType]
+    # type: () -> List[ModuleType]
     """Return all the modules inside the package."""
     import maya_tools._internal
     import maya_tools.api
