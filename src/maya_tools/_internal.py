@@ -1,7 +1,7 @@
 """Internal utilities to manage the functions inside the package."""
 import functools
 import logging
-from typing import Callable
+from typing import Any, Callable, Optional
 
 from maya import cmds
 
@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 
 
 def with_maya(minimum=None, maximum=None):
-    # type: (int, int) -> Callable
+    # type: (Optional[int], Optional[int]) -> Callable[..., Any]
     """Ensure the version of maya before executing the function.
 
     Examples:
@@ -31,10 +31,9 @@ def with_maya(minimum=None, maximum=None):
         function: The decoratoed function.
     """
 
-    def decorator(func):
+    def decorator(func):  # type: ignore
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-
+        def wrapper(*args, **kwargs):  # type: ignore
             version = int(cmds.about(version=True))
             if minimum is not None and version < minimum:
                 msg = "Invalid maya version. min={} max={} current={}"

@@ -44,6 +44,6 @@ def create(geometry, name="cluster"):
         bindState=True,
     )
     cmds.delete(old)
-    new = cmds.rename(new, name)
+    renamed = cmds.rename(new, name)  # type: str
     cmds.rename(shape, new + "Shape")
-    return new
+    return renamed

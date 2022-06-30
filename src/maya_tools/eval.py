@@ -1,6 +1,6 @@
 """Eval utilities."""
 import logging
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Optional
 
 __all__ = ["exec_string"]
 
@@ -8,7 +8,7 @@ LOG = logging.getLogger(__name__)
 
 
 def exec_string(code, language="python", decorators=None):
-    # type: (str, str, Iterable[Callable]) -> Any
+    # type: (str, str, Optional[Iterable[Callable[..., Any]]]) -> Any
     """Execute a string as python code.
 
     The languages available are ``python`` and ``mel``.

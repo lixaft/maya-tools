@@ -1,5 +1,6 @@
 """Hierarchy utilities."""
 import logging
+from typing import Any, Dict, Generator, Optional
 
 from maya import cmds
 from maya.api import OpenMaya
@@ -49,7 +50,7 @@ def make(path, node="transform"):
 
 
 def tree(root, include_root=False):
-    # type: (str, bool) -> dict[str, dict]
+    # type: (str, bool) -> Dict[str, Any]
     """Get the node tree from the specified root node.
 
     Examples:
@@ -74,7 +75,7 @@ def tree(root, include_root=False):
     Returns:
         dict: A dictionary that contains all descendants of the root node.
     """
-    tree_dict = {}
+    tree_dict = {}  # type: Dict[str, Any]
     for child in cmds.listRelatives(root, children=True) or []:
         tree_dict[child] = tree(child)
     if include_root:
@@ -83,6 +84,7 @@ def tree(root, include_root=False):
 
 
 def sort(root=None, recursive=False):
+    # type: (Optional[str], bool) -> None
     """Sort the children of the provided root.
 
     If no root node is specified, reorder the top level nodes.
@@ -102,6 +104,7 @@ def sort(root=None, recursive=False):
 
 
 def safe_descendants(node, path=False):
+    # type: (str, bool) -> Generator[str, None, None]
     """Safe iteration over the descendants of the given node.
 
     Arguments:

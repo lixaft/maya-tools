@@ -1,5 +1,6 @@
 """Provide utilities related to deformers."""
 import logging
+from typing import List, Optional
 
 from maya import cmds
 
@@ -9,16 +10,17 @@ LOG = logging.getLogger(__name__)
 
 
 def find(node, type=None):
+    # type: (str, Optional[str]) -> List[str]
     # pylint: disable=redefined-builtin
     """Find all the deformers associated to the node.
 
     Arguments:
-        node (str): The name of node on which find the deformers.
-        sets (bool): Return the deformer sets instead of the deformers.
-        type (str): Filter the type of the returned deformers.
+        node: The name of node on which find the deformers.
+        sets: Return the deformer sets instead of the deformers.
+        type: Filter the type of the returned deformers.
 
     Retruns:
-        list: An array that will contains all the deofmers of the shape.
+        An array that will contains all the deofmers of the shape.
     """
     result = []
     for deformer in cmds.findDeformers(node):
@@ -29,6 +31,7 @@ def find(node, type=None):
 
 
 def find_set(node):
+    # type: (str) -> Optional[str]
     """Find the set of a deformer node.
 
     Arguments:
@@ -44,5 +47,7 @@ def find_set(node):
             each + ".message",
             type="objectSet",
             exactType=True,
-        )
-        return (sets or [None])[0]
+        )  # type: Optional[List[str]]
+        if sets:
+            return sets[0]
+    return None

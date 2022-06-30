@@ -2,7 +2,7 @@
 from __future__ import division
 
 import logging
-from typing import Any
+from typing import Any, Dict, List, Tuple, Union, cast
 
 from maya import cmds
 from maya.api import OpenMaya
@@ -20,8 +20,12 @@ __all__ = [
 LOG = logging.getLogger(__name__)
 
 
+Vector = Tuple[float, float, float]
+Cached = List[Union[int, bool, List[float]]]
+
+
 def get_points(curve, world=False, method="cv"):
-    # type: (str, bool, str) -> list[tuple[float, float, float]]
+    # type: (str, bool, str) -> List[Vector]
     """Query the position of each control points of a curve.
 
     Its possible to query either ``cv`` and ``ep`` points using the ``method``
@@ -58,7 +62,7 @@ def get_points(curve, world=False, method="cv"):
 
 
 def get_cached(curve):
-    # type: (str) -> list[int | bool | list[float]]
+    # type: (str) -> Cached
     """Extract the data contained in the .cached attribute.
 
     Examples:
@@ -84,7 +88,7 @@ def get_cached(curve):
     cmd = [x.strip().split() for x in plug.getSetAttrCmds()[1:-1]]
 
     # Add base.
-    args = []  # type: list[int | bool | list[float]]
+    args = []  # type: Cached
     args.extend([int(x) for x in cmd[0][:3] + [cmd[0][-1]]])
     args.insert(-1, cmd[0][3] != "no")
 
@@ -100,7 +104,7 @@ def get_cached(curve):
 
 
 def set_cached(curve, value):
-    # type: (str, list[int | bool | list[float]]) -> None
+    # type: (str, Cached) -> None
     """Set the value of cached plug.
 
     Examples:
@@ -119,7 +123,7 @@ def set_cached(curve, value):
 
 
 def from_points(points, name="curve", degree=3, close=False, method="cv"):
-    # type: (list[tuple[float, float, float]], str, int, bool, str) -> str
+    # type: (List[Vector], str, int, bool, str) -> str
     """Create a curve from the given points.
 
     Examples:
@@ -129,24 +133,25 @@ def from_points(points, name="curve", degree=3, close=False, method="cv"):
         'curve'
 
     Arguments:
-        points (list): The points from which the curve will be generated.
-        name (str): The name to give to the curve.
-        degree (int): The degree of the curve.
-        close (bool): Should the curve be build closed?
-        method (str): The method used to generate the curve.
+        points: The points from which the curve will be generated.
+        name: The name to give to the curve.
+        degree: The degree of the curve.
+        close: Should the curve be build closed?
+        method: The method used to generate the curve.
 
     Returns:
-        str: The name of the created curve.
+        The name of the created curve.
     """
-    flags = {}  # type: dict[str, Any]
+    flags = {}  # type: Dict[str, Any]
     flags["point"] = points
     flags["degree"] = degree if method == "cv" else 1
     if close:
         flags["point"].extend(points[:degree])
         flags["periodic"] = True
-        flags["knot"] = list(range(len(flags["point"]) + flags["degree"] - 1))
-        return flags["knot"]
-    curve = cmds.curve(**flags)
+        flags["knot"] = list(range(len(points) + degree - 1))
+    if method == "ep":
+        flags["degree"] = 1
+    curve = cast(str, cmds.curve(**flags))
     curve = cmds.rename(curve, name)
 
     if method == "ep":
@@ -199,17 +204,17 @@ def from_transforms(
         'curve'
 
     Arguments:
-        nodes (list): The nodes from which the curve will be created.
-        name (str): The name of the curve.
-        degree (int): The degree of the curve.
-        close (bool): Specify if the curve is closed or not.
-        method (str): The type of points used to generate the curve.
-        attach (bool): Constraint the given nodes to each cvs.
+        nodes: The nodes from which the curve will be created.
+        name: The name of the curve.
+        degree: The degree of the curve.
+        close: Specify if the curve is closed or not.
+        method: The type of points used to generate the curve.
+        attach: Constraint the given nodes to each cvs.
 
     Returns:
-        str: The name of the curve.
+        The name of the curve.
     """
-    flags = {}  # type: dict[str, Any]
+    flags = {}  # type: Dict[str, Any]
     flags["query"] = True
     flags["translation"] = True
     flags["worldSpace"] = True
@@ -225,7 +230,7 @@ def from_transforms(
     if method == "ep":
         flags["degree"] = 1
 
-    curve = cmds.curve(**flags)
+    curve = cast(str, cmds.curve(**flags))
     curve = cmds.rename(curve, name)
 
     if method == "ep":
@@ -278,9 +283,9 @@ def replace(old, new):
 
 def transform(
     curve,  # type: str
-    translate=(0, 0, 0),  # type: tuple[float, float, float]
-    rotate=(0, 0, 0),  # type: tuple[float, float, float]
-    scale=(1, 1, 1),  # type: tuple[float, float, float]
+    translate=(0, 0, 0),  # type: Vector
+    rotate=(0, 0, 0),  # type: Vector
+    scale=(1, 1, 1),  # type: Vector
     space="object",  # type: str
 ):  # type: (...) -> None
     """Apply transformation on the shape of the given curve.

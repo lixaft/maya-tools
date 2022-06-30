@@ -1,5 +1,6 @@
 """Connection utilities."""
 import logging
+from typing import List, Optional, cast
 
 from maya import cmds
 from maya.api import OpenMaya
@@ -10,7 +11,7 @@ LOG = logging.getLogger(__name__)
 
 
 def matrix_to_srt(plug, transform, destinations=None):
-    # type: (str, str, list[str] | None) -> str
+    # type: (str, str, Optional[List[str]]) -> str
     """Connect a matrix plug to scale/rotate/translate attributes.
 
     The ``destinations`` parameter accepts a list of strings which represent
@@ -36,7 +37,7 @@ def matrix_to_srt(plug, transform, destinations=None):
         str: The name of the decomposeMatrix node use.
     """
     name = plug.split(".", 1)[0] + "_decomposeMatrix"
-    decompose = cmds.createNode("decomposeMatrix", name=name)
+    decompose = cast(str, cmds.createNode("decomposeMatrix", name=name))
     cmds.connectAttr(plug, decompose + ".inputMatrix")
     for attribute in destinations or (x + y for x in "srt" for y in "xyz"):
         dst = "{}.{}".format(transform, attribute)
@@ -46,7 +47,7 @@ def matrix_to_srt(plug, transform, destinations=None):
 
 
 def disconnect(node, attributes=None, source=False, destination=False):
-    # type: (str, list[str] | None, bool, bool) -> None
+    # type: (str, Optional[List[str]], bool, bool) -> None
     """Disconnect the connection of the given node/attributes.
 
     Examples:
@@ -59,11 +60,10 @@ def disconnect(node, attributes=None, source=False, destination=False):
         >>> disconnect(a, source=True, destination=True)
 
     Arguments:
-        node (str): The name of the node to disconnect.
-        attributes (list, optional): Filter the attributes that should be
-            disconnected.
-        source (bool): Disconnect the source (input) connections.
-        destination (bool): Disconnect the destination (output) connections.
+        node: The name of the node to disconnect.
+        attributes: Filter the attributes that should be disconnected.
+        source: Disconnect the source (input) connections.
+        destination: Disconnect the destination (output) connections.
     """
     for attribute in attributes or cmds.listAttr(connectable=True) or []:
         plug = "{}.{}".format(node, attribute)
@@ -93,7 +93,7 @@ def disconnect(node, attributes=None, source=False, destination=False):
 
 
 def find_related(root, node_type, stream="history"):
-    # type: (str, str, str) -> str | None
+    # type: (str, str, str) -> Optional[str]
     """Find a node related to the root.
 
     The function will search for a node in the specified direction (stream).
@@ -111,12 +111,12 @@ def find_related(root, node_type, stream="history"):
         True
 
     Arguments:
-        root (str): The node from which the search will be based.
-        node_type (str): The type of the node to find.
-        stream (str): The direction in which the search will be performed.
+        root: The node from which the search will be based.
+        node_type: The type of the node to find.
+        stream: The direction in which the search will be performed.
 
     Returns:
-        str: The name of the first node found. If no node matches the
+        The name of the first node found. If no node matches the
             parameters, returns ``None``.
     """
 
@@ -137,6 +137,6 @@ def find_related(root, node_type, stream="history"):
         # the passed string? If anyone has an idea xD
         # e.g. mesh -> kMesh, skinCluster -> kSkinClusterFilter, etc.
         if current.typeName == node_type:
-            return current.name()
+            return cast(str, current.name())
         mit.next()
     return None

@@ -324,7 +324,7 @@ def unlock(
         >>> plug = node + ".translateX"
         >>> cmds.setAttr(plug, lock=True)
         >>> cmds.setAttr(plug, 1)
-        Traceback (most  # type: ignore recent call last):
+        Traceback (most recent call last):
           ...
         RuntimeError
         >>> with unlock(node):

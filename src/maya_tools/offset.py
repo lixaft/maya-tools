@@ -19,43 +19,45 @@ LOG = logging.getLogger(__name__)
 
 
 def group(node, suffix="offset"):
+    # type: (str, str) -> str
     """Create a group above the node with the same transformation values.
 
     Arguments:
-        node (str): The node which create the offset group.
-        suffix (str): The suffix of the offset group.
+        node: The node which create the offset group.
+        suffix: The suffix of the offset group.
 
     Returns:
-        str: The offset node name.
+        The offset node name.
     """
     offset = cmds.createNode(
         "transform",
         name="{}_{}".format(node, suffix),
         parent=(cmds.listRelatives(node, parent=True) or [None])[0],
-    )
+    )  # type: str
     cmds.matchTransform(offset, node)
     cmds.parent(node, offset)
     return offset
 
 
 def inverse_group(node):
+    # type: (str) -> str
     """Create an offset that cancel the transformation values of the nodes.
 
     Arguments:
-        node (str): The node which create the inverse offset.
+        node: The node which create the inverse offset.
 
-    Returns:s
-        str: The offset node name.
+    Returns:
+        The offset node name.
     """
     inverse = group(node, suffix="inverse")
     offset = group(inverse)
     offset = cmds.rename(offset, node + "_offset")
-    # ftd.graph.matrix_to_srt(node + ".inverseMatrix", inverse)
     return offset
 
 
 @maya_tools._internal.with_maya(minimum=2020)
 def matrix(node):
+    # type: (str) -> None
     """Transfer the transformation to the offsetParentMatrix attribute.
 
     Examples:
@@ -70,7 +72,7 @@ def matrix(node):
         5.0
 
     Arguments:
-        node (str): The name of the node to offset.
+        node: The name of the node to offset.
     """
     matrix_ = OpenMaya.MMatrix(cmds.getAttr(node + ".worldMatrix[0]"))
     parent = OpenMaya.MMatrix(cmds.getAttr(node + ".parentInverseMatrix[0]"))
@@ -81,17 +83,21 @@ def matrix(node):
     cmds.setAttr(node + ".shear", 0, 0, 0)
 
 
+@maya_tools._internal.with_maya(minimum=2020)
 def reset_matrix(node):
+    # type: (str) -> None
     """Reset the offsetParentMatrix attribute to identity.
 
     Arguments:
-        node (str): The node to reset.
+        node: The node to reset.
     """
     matrix_ = OpenMaya.MMatrix()
     cmds.setAttr(node + ".offsetParentMatrix", matrix_, type="matrix")
 
 
+@maya_tools._internal.with_maya(minimum=2020)
 def unmatrix(node):
+    # type: (str) -> None
     """Transfer the transformation to the translate/rotate/scale attributes.
 
     Examples:
@@ -107,7 +113,7 @@ def unmatrix(node):
         5.0
 
     Arguments:
-        node (str): The target node.
+        node: The target node.
     """
     matrix_ = OpenMaya.MMatrix(cmds.getAttr(node + ".worldMatrix[0]"))
     identity = OpenMaya.MMatrix.kIdentity

@@ -1,5 +1,6 @@
 """Provide utilities related to constraints."""
 import logging
+from typing import List, Optional, cast
 
 from maya import cmds
 from maya.api import OpenMaya
@@ -10,7 +11,7 @@ LOG = logging.getLogger(__name__)
 
 
 def matrix(driver, driven, destinations=None):
-    # type: (str, str, list[str] | None) -> str
+    # type: (str, str, Optional[List[str]]) -> str
     """Constraint two node using matrix nodes.
 
     Examples:
@@ -22,13 +23,13 @@ def matrix(driver, driven, destinations=None):
         'B_multMatrix'
 
     Arguments:
-        driver (str): The name of the node that will be drive the constraint.
-        driven (str): The node that will be drived by the constraint.
-        destinations (list, optional): The name of the attributes on which the
-            constraint will be connected to.
+        driver: The name of the node that will be drive the constraint.
+        driven: The node that will be drived by the constraint.
+        destinations: The name of the attributes on which the constraint will
+            be connected to.
 
     Returns:
-        str: The name of the `multMatrix` node used for the constraint.
+        The name of the `multMatrix` node used for the constraint.
     """
     # Get the driver and driven matrices.
     driver_plug = driver + ".worldMatrix[0]"
@@ -37,7 +38,8 @@ def matrix(driver, driven, destinations=None):
     driven_matrix = OpenMaya.MMatrix(cmds.getAttr(driven_plug))
 
     # Create the mult matrix that will handle the constraint.
-    mult = cmds.createNode("multMatrix", name=driven + "_multMatrix")
+    name = driven + "_multMatrix"
+    mult = cast(str, cmds.createNode("multMatrix", name=name))
 
     # Connect and set the matrix elements.
     offset = driven_matrix * driver_matrix.inverse()

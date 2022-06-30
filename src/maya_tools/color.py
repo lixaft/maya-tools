@@ -1,5 +1,6 @@
 """Provide utilities related to colors."""
 import logging
+from typing import Tuple
 
 import webcolors
 
@@ -96,7 +97,7 @@ def name(node, value):
 
 
 def rgb(node, values, rerange=255):
-    # type: (str, tuple[float, float, float], int) -> None
+    # type: (str, Tuple[float, float, float], int) -> None
     """Set the color of a node using RGB values.
 
     Caution:
@@ -126,6 +127,7 @@ def rgb(node, values, rerange=255):
 
 
 def disable(node):
+    # type: (str) -> None
     """Disable the color override.
 
     Examples:

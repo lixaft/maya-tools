@@ -1,11 +1,8 @@
 """Blendshape utilities."""
 import logging
-from typing import Collection, Iterable
+from typing import Iterable, Optional, Sequence, Union
 
-try:
-    from itertools import zip_longest
-except ImportError:
-    from itertools import izip_longest as zip_longest  # type: ignore
+from six.moves import zip_longest
 
 from maya import cmds
 
@@ -16,10 +13,10 @@ LOG = logging.getLogger(__name__)
 
 def create(
     base,  # type: str
-    targets,  # type: Collection[str]
-    weights=0,  # type: Iterable[float] | float
+    targets,  # type: Sequence[str]
+    weights=0,  # type: Union[float, Sequence[float]]
     name="blendShape",  # type: str
-    aliases=None,  # type: Iterable[str]
+    aliases=None,  # type: Optional[Iterable[str]]
 ):  # type: (...) -> str
     """Create a new blendshape deformer.
 
@@ -48,7 +45,7 @@ def create(
     if isinstance(weights, (int, float)):
         weights = [weights] * len(targets)
 
-    deformer = cmds.blendShape(base, name=name)[0]
+    deformer = cmds.blendShape(base, name=name)[0]  # type: str
     iterable = zip_longest(targets, aliases or [], weights)
     for i, (target, alias, weight) in enumerate(iterable):
         cmds.blendShape(

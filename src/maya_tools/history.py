@@ -2,6 +2,7 @@
 import contextlib
 import functools
 import logging
+from typing import Generator, Optional
 
 from maya import cmds
 
@@ -10,7 +11,7 @@ __all__ = ["repeat", "undo"]
 LOG = logging.getLogger(__name__)
 
 
-def repeat(func):
+def repeat(func):  # type: ignore
     """Decorate a function to make it repeatable.
 
     This means that in maya, when the shortcut ``ctrl+G`` is triggered,
@@ -18,7 +19,7 @@ def repeat(func):
     """
 
     @functools.wraps(func)
-    def _wrapper(*args, **kwargs):
+    def _wrapper(*args, **kwargs):  # type: ignore
         name = "__function_to_repeat__"
         globals()[name] = functools.partial(func, *args, **kwargs)
         cmds.repeatLast(
@@ -32,6 +33,7 @@ def repeat(func):
 
 @contextlib.contextmanager
 def undo(name=None):
+    # type: (Optional[str]) ->  Generator[None, None, None]
     """Gather all the maya commands under the same undo chunk.
 
     Using the maya ``cmds.undoInfo()`` command to create the chunk can be
