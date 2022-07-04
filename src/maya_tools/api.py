@@ -1,6 +1,7 @@
 """Maya api utilities."""
 import logging
 
+from maya import cmds
 from maya.api import OpenMaya
 
 __all__ = [
@@ -168,3 +169,23 @@ def as_mesh(name):
         OpenMaya.MFnMesh: The converted instance of the name.
     """
     return OpenMaya.MFnMesh(as_path(name).extendToShape().node())
+
+
+def get_matrix(name):
+    # type: (str) -> OpenMaya.MMatrix
+    """Get the MMatrix associated to the given name.
+
+    Examples:
+        >>> from maya import cmds
+        >>> _ = cmds.file(new=True, force=True)
+        >>> as_mesh(cmds.polySphere()[0])
+        <OpenMaya.MMatrix object at 0x...>
+
+    Arguments:
+        name: The name of the object to query.
+
+    Returns:
+        The MMatrix instance where the given node is located.
+    """
+    matrix = cmds.xform(name, query=True, matrix=True, worldSpace=True)
+    return OpenMaya.MMatrix(matrix)
