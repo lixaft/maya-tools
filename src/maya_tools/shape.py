@@ -1,5 +1,6 @@
 """Shape related utilities."""
 import logging
+from typing import Optional, cast
 
 from maya import cmds
 
@@ -9,7 +10,7 @@ LOG = logging.getLogger(__name__)
 
 
 def get_orig(shape):
-    # type (str) -> str
+    # type: (str) -> str
     """Return the orig shape associated to the given shape.
 
     In the case where the given shape doesn't have any orig shape, create one
@@ -34,10 +35,11 @@ def get_orig(shape):
     orig = cmds.deformableShape(shape, originalGeometry=True)[0]
     if not orig:
         orig = cmds.deformableShape(shape, createOriginalGeometry=True)[0]
-    return orig.split(".")[0]
+    return cast(str, orig.split(".")[0])
 
 
 def clean_orig(node=None):
+    # type: (Optional[str]) -> None
     """Clean the unused orig shapes.
 
     If no arguments is specified, operate on all nodes in the scene.

@@ -1,5 +1,6 @@
 """Provide utilities related to skinclusters."""
 import logging
+from typing import List, cast
 
 from maya import cmds, mel
 
@@ -15,7 +16,7 @@ LOG = logging.getLogger(__name__)
 
 
 def create(node, influences, method="blend"):
-    # type: (str, list[str], str) -> str | None
+    # type: (str, List[str], str) -> str
     """Create and attach a skincluster to the specified node.
 
     The ``method`` parameter defines the algorithm used to get the position of
@@ -34,13 +35,12 @@ def create(node, influences, method="blend"):
         'cube_skinCluster'
 
     Arguments:
-        node (str): The node on which creates the skincluster.
-        influences (list, optional): The influence objects that will deform
-            the skincluster.
-        method (str): The binded method that will be used to deform the mesh.
+        node: The node on which creates the skincluster.
+        influences: The influence objects that will deform the skincluster.
+        method: The binded method that will be used to deform the mesh.
 
     Returns:
-        str: The name of the created skincluster.
+        The name of the created skincluster.
 
     Raises:
         ValueError: The specified method id not recognized.
@@ -65,10 +65,11 @@ def create(node, influences, method="blend"):
         delta = set(influences) - set(current)
         cmds.skinCluster(skincluster, edit=True, addInfluence=delta)
 
-    return skincluster
+    return cast(str, skincluster)
 
 
 def find_influences(node, weighted=True, unused=True):
+    # type: (str, bool, bool) -> List[str]
     """Get the associated influence objects associated to a skincluster.
 
     Example:
@@ -94,24 +95,28 @@ def find_influences(node, weighted=True, unused=True):
         ['B']
 
     Arguments:
-        node (str): The node on which query the influence objects.
-        weighted (bool): Include the influence objects with non-zero weights.
-        unused (bool): Include the influence objects with zero weights.
+        node: The node on which query the influence objects.
+        weighted: Include the influence objects with non-zero weights.
+        unused: Include the influence objects with zero weights.
 
     Returns:
-        list: An array containing the influence objects.
+        An array containing the influence objects.
     """
     skc = mel.eval("findRelatedSkinCluster {}".format(node))
-    all_ = cmds.skinCluster(skc, query=True, influence=True)
+    all_ = cast(List[str], cmds.skinCluster(skc, query=True, influence=True))
     if unused and weighted:
         return all_
-    weighted_ = cmds.skinCluster(node, query=True, weightedInfluence=True)
+    weighted_ = cast(
+        List[str],
+        cmds.skinCluster(node, query=True, weightedInfluence=True),
+    )
     if weighted:
         return weighted_
     return list(set(all_) - set(weighted_))
 
 
 def add_influences(node, influences):
+    # type: (str, List[str]) -> None
     """Add influences to an existing skincluster.
 
     Note:
@@ -132,8 +137,8 @@ def add_influences(node, influences):
         ['A', 'B']
 
     Arguments:
-        node (str): The deformed node on which the skincluster is attached.
-        influences (list): The influences nodes to add to the skincluster.
+        node: The deformed node on which the skincluster is attached.
+        influences: The influences nodes to add to the skincluster.
     """
     skincluster = mel.eval("findRelatedSkinCluster {}".format(node))
     if not skincluster:
@@ -145,6 +150,7 @@ def add_influences(node, influences):
 
 
 def remove_influences(node, influences):
+    # type: (str, List[str]) -> None
     """Remove influences to an existing skincluster.
 
     Note:
@@ -165,8 +171,8 @@ def remove_influences(node, influences):
         ['A']
 
     Arguments:
-        node (str): The deformed node on which the skincluster is attached.
-        influences (list): The influence nodes to add to the skincluster.
+        node: The deformed node on which the skincluster is attached.
+        influences: The influence nodes to add to the skincluster.
 
     Raises:
         RuntimeError: No skincluster attached on the node.
@@ -180,6 +186,7 @@ def remove_influences(node, influences):
 
 
 def remove_unused_influences(node):
+    # type: (str) -> None
     """Remove the unused influences using the :func:`remove` function.
 
     Examples:
@@ -199,6 +206,6 @@ def remove_unused_influences(node):
         ['A']
 
     Arguments:
-        node (str): The deformed node on which the skincluster is attached.
+        node: The deformed node on which the skincluster is attached.
     """
     remove_influences(node, find_influences(node, weighted=False, unused=True))

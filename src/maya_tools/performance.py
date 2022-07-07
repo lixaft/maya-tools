@@ -6,7 +6,7 @@ import cProfile
 import logging
 import pstats
 import time
-from typing import Generator
+from typing import Generator, Optional
 
 from maya import cmds
 
@@ -16,6 +16,7 @@ LOG = logging.getLogger(__name__)
 
 
 def fps(loop=5, mode="parallel", gpu=True, cache=False, renderer="vp2"):
+    # type: (int, str, bool, bool, str) -> None
     # pylint: disable=unused-argument
     """Measure the fps of the current scene.
 
@@ -25,11 +26,11 @@ def fps(loop=5, mode="parallel", gpu=True, cache=False, renderer="vp2"):
     The values for the evulation mode parameter are (the case does not matter):
 
     Arguments:
-        loop (int): The number of times the test should be run.
-        mode (str): The evaluation mode to use.
-        gpu (bool): Turn on/off the gpu override.
-        cache (bool): Turn on/off the cached playback.
-        renderer (str): The viewport that will be used to run the test.
+        loop: The number of times the test should be run.
+        mode: The evaluation mode to use.
+        gpu: Turn on/off the gpu override.
+        cache: Turn on/off the cached playback.
+        renderer: The viewport that will be used to run the test.
     """
     panel = cmds.getPanel(withFocus=True)
 
@@ -94,14 +95,15 @@ def fps(loop=5, mode="parallel", gpu=True, cache=False, renderer="vp2"):
 
 @contextlib.contextmanager
 def profile(sort="time", lines=None, strip=False):
+    # type: (str, Optional[int], bool) -> Generator[None, None, None]
     """Detail the execution of all statements in the block.
 
     The following are the values accepted by the ``sort`` parameter:
 
     Arguments:
-        sort (str): Sorts the output according to the specified mode.
-        lines (int): Limits the output to a specified number of lines.
-        strip (bool): Removes all leading path information from file name.
+        sort: Sorts the output according to the specified mode.
+        lines: Limits the output to a specified number of lines.
+        strip: Removes all leading path information from file name.
     """
     profiler = cProfile.Profile()
     profiler.enable()

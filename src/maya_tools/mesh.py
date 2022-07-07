@@ -1,6 +1,7 @@
 """Mesh utilities."""
 import logging
 import operator
+from typing import Optional, Tuple, cast
 
 from maya import cmds
 from maya.api import OpenMaya
@@ -34,6 +35,7 @@ def reset_vertices(mesh):
 
 
 def closest_vertex(mesh, origin):
+    # type: (str, Tuple[float, float, float]) -> Tuple[str, float]
     """Find the closest vertex to a given position.
 
     Examples:
@@ -44,13 +46,12 @@ def closest_vertex(mesh, origin):
         (3, 1.5)
 
     Arguments:
-        mesh (str): The name of the mesh on which the vertex will be searched.
-        origin (tuple): The x, y and z positions of the point to use as the
-            origin.
+        mesh: The name of the mesh on which the vertex will be searched.
+        origin: The x, y and z positions of the point to use as the origin.
 
     Returns:
-        tuple: The index of the closest vertex as the first index and its
-        distance from the origin as the second index.
+        The index of the closest vertex as the first index and its distance
+        from the origin as the second index.
     """
     sel = OpenMaya.MSelectionList()
     sel.add(mesh)
@@ -74,7 +75,7 @@ def closest_vertex(mesh, origin):
 
 
 def minimal_duplicate(mesh, name=None):
-    # type: (str, str | None) -> str
+    # type: (str, Optional[str]) -> str
     """Create a minimal copy of the given mesh.
 
     Using ``cmds.duplicate()``, everything is duplicated from the source mesh.
@@ -120,4 +121,4 @@ def minimal_duplicate(mesh, name=None):
     dst.create(src.getPoints(), count, connect, parent=obj)
     dst.setName(OpenMaya.MFnTransform(obj).name() + "Shape")
 
-    return dst.name()
+    return cast(str, dst.name())

@@ -1,6 +1,7 @@
 """Provide utilities related to names."""
 import logging
 import re
+from typing import List
 
 from maya import cmds
 
@@ -10,6 +11,7 @@ LOG = logging.getLogger(__name__)
 
 
 def find_conflicts(create_set=False, set_name="CONFLICTS_NODES"):
+    # type: (bool, str) -> List[str]
     """Find the nodes with a name that appear more than once in the scene.
 
     Examples:
@@ -28,11 +30,11 @@ def find_conflicts(create_set=False, set_name="CONFLICTS_NODES"):
         []
 
     Arguments:
-        create_set (bool): Put all the conflicts nodes in an objectSet.
-        set_name (str): The name of the set that will optionally be created.
+        create_set: Put all the conflicts nodes in an objectSet.
+        set_name: The name of the set that will optionally be created.
 
     Returns:
-        list: The name of the conflicts nodes.
+        The name of the conflicts nodes.
     """
     nodes = [x for x in cmds.ls() if "|" in x]
     if create_set:
@@ -44,6 +46,7 @@ def find_conflicts(create_set=False, set_name="CONFLICTS_NODES"):
 
 
 def unique(name):
+    # type: (str) -> str
     """Generate a name that is guaranteed to be unique to avoid conflicts.
 
     If the base of the name contains at least one ``#`` character, it will be
@@ -86,10 +89,10 @@ def unique(name):
         NameError:
 
     Arguments:
-        name (str): The base string from which the name will be generated.
+        name: The base string from which the name will be generated.
 
     Returns:
-        str: The unique generated name.
+        The unique generated name.
 
     Raises:
         NameError: More than one block of '#'.
@@ -101,6 +104,7 @@ def unique(name):
         raise NameError("More than one block of '#'.")
 
     def _build():
+        # type: () -> str
         i = str(index).zfill(count)
         return name.replace("#" * count, i) if count else name
 
@@ -116,6 +120,7 @@ def unique(name):
 
 
 def nice(name):
+    # type: (str) -> str
     """Generate a nice name based on the given string.
 
     Examples:
@@ -133,9 +138,9 @@ def nice(name):
         'Simple Name'
 
     Arguments:
-        name (str): The string from which generate the nice name.
+        name: The string from which generate the nice name.
 
     Returns:
-        str: The generated nice name.
+        The generated nice name.
     """
     return re.sub(r"(?<!^)([A-Z])", r" \1", name).replace("_", " ").title()

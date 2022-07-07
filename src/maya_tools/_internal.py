@@ -53,6 +53,8 @@ def with_maya(minimum=None, maximum=None):
 
 @contextlib.contextmanager
 def nested_managers(*managers):
+    # pylint: disable=redefined-builtin, broad-except
+    # pylint: disable=consider-using-sys-exit, raising-bad-type
     """Combine multiple context managers into a single nested context manager.
 
     This function has been deprecated in favour of the multiple manager form
@@ -67,15 +69,15 @@ def nested_managers(*managers):
 
     """
     exits = []
-    vars = []
+    vars_ = []
     exc = (None, None, None)
     try:
         for mgr in managers:
             exit = mgr.__exit__
             enter = mgr.__enter__
-            vars.append(enter())
+            vars_.append(enter())
             exits.append(exit)
-        yield vars
+        yield vars_
     except BaseException:
         exc = sys.exc_info()
     finally:

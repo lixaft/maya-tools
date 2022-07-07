@@ -2,7 +2,7 @@
 import logging
 from typing import Iterable, Optional, Sequence, Union
 
-from six.moves import zip_longest
+from six.moves import zip_longest  # type: ignore
 
 from maya import cmds
 

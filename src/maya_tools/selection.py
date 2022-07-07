@@ -1,12 +1,12 @@
 """Utilities related to selection."""
 import contextlib
 import logging
-from typing import Generator
+from typing import Generator, List
 
 from maya import cmds
 from maya.api import OpenMaya, OpenMayaUI
 
-__all__ = ["from_viewport", "keep", "mirror"]
+__all__ = ["from_viewport", "keep"]
 LOG = logging.getLogger(__name__)
 
 
@@ -29,7 +29,7 @@ def from_viewport():  # pragma: no cover
 
 @contextlib.contextmanager
 def keep():
-    # type: () -> Generator[list[str], None, None]
+    # type: () -> Generator[List[str], None, None]
     """Preserve the selection during the execution.
 
     This will store the current selection, execute the given block and then

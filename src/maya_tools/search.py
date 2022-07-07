@@ -2,16 +2,17 @@
 import itertools
 import logging
 import re
-from typing import Optional, Sequence
+from typing import Generator, Optional, Sequence
 
 from maya import cmds
 
 LOG = logging.getLogger(__name__)
 
-__all__ = ["regex"]
+__all__ = ["regex", "mirror"]
 
 
 def regex(expression):
+    # type: (str) -> Generator[str, None, None]
     """Find nodes based on regular expression.
 
     Examples:

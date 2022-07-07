@@ -74,6 +74,7 @@ def auto_radius(root, method="average", multiplier=1.0, recursive=False):
     """
 
     def get_point(node):
+        # type: (str) -> OpenMaya.MPoint
         pos = cmds.xform(node, query=True, translation=True, worldSpace=True)
         return OpenMaya.MPoint(pos)
 
