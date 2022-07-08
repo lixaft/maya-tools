@@ -178,8 +178,8 @@ def get_matrix(name):
     Examples:
         >>> from maya import cmds
         >>> _ = cmds.file(new=True, force=True)
-        >>> as_mesh(cmds.polySphere()[0])
-        <OpenMaya.MMatrix object at 0x...>
+        >>> get_matrix(cmds.polySphere()[0])
+        maya.api.OpenMaya.MMatrix(...)
 
     Arguments:
         name: The name of the object to query.

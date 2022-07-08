@@ -38,7 +38,7 @@ def toggle_panel_element(element, panel=None):
     Examples:
         >>> from maya import cmds
         >>> panel = cmds.getPanel(withFocus=True)
-        >>> toggle_element("joint")
+        >>> toggle_panel_element("joint")
         >>> cmds.modelEditor(panel, query=True, joint=True)
         False
 
