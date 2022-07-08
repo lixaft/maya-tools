@@ -6,103 +6,23 @@ import cProfile
 import logging
 import pstats
 import time
-from typing import Generator, Optional
+from typing import Generator, Union
 
-from maya import cmds
-
-__all__ = ["fps", "profile", "timing"]
+__all__ = ["profile", "timing"]
 
 LOG = logging.getLogger(__name__)
 
 
-def fps(loop=5, mode="parallel", gpu=True, cache=False, renderer="vp2"):
-    # type: (int, str, bool, bool, str) -> None
-    # pylint: disable=unused-argument
-    """Measure the fps of the current scene.
-
-    It take the active range of the scene, play it view time and show the
-    result in the stdout.
-
-    The values for the evulation mode parameter are (the case does not matter):
-
-    Arguments:
-        loop: The number of times the test should be run.
-        mode: The evaluation mode to use.
-        gpu: Turn on/off the gpu override.
-        cache: Turn on/off the cached playback.
-        renderer: The viewport that will be used to run the test.
-    """
-    panel = cmds.getPanel(withFocus=True)
-
-    # Set the playback speed to free
-    playback_spped = cmds.playbackOptions(query=True, playbackSpeed=True)
-    cmds.playbackOptions(edit=True, playbackSpeed=0)
-
-    # Set the viewport renderer
-    current_renderer = cmds.modelEditor(panel, query=True, rendererName=True)
-    args = {"vp1": "base_OpenGL_Renderer", "vp2": "vp2Renderer"}
-    arg = args.get(renderer.lower(), renderer)
-    cmds.modelEditor(panel, edit=True, rendererName=arg)
-
-    # Set the evaluation mode
-    current_mode = cmds.evaluationManager(query=True, mode=True)[0]
-    args = {
-        "emp": "parallel",
-        "ems": "serial",
-        "dg": "off",
-        "//": "parallel",
-        "->": "off",
-    }
-    cmds.evaluationManager(mode=args.get(mode.lower(), mode.lower()))
-
-    # Disable cycle check
-    cycle_check = cmds.cycleCheck(query=True, evaluation=True)
-    cmds.cycleCheck(evaluation=False)
-
-    # Run performance test
-    results = []
-    current_frame = cmds.currentTime(query=True)
-    start_frame = cmds.playbackOptions(query=True, minTime=True)
-    end_frame = cmds.playbackOptions(query=True, maxTime=True)
-    frame_range = end_frame - start_frame
-    for _ in range(loop):
-        cmds.currentTime(start_frame)
-        start_time = time.time()
-        cmds.play(wait=True)
-        end_time = time.time()
-        result = end_time - start_time
-        results.append(round(frame_range / result))
-    cmds.currentTime(current_frame)
-
-    # Restore the configuration
-    cmds.playbackOptions(edit=True, playbackSpeed=playback_spped)
-    cmds.modelEditor(panel, edit=True, rendererName=current_renderer)
-    cmds.evaluationManager(mode=current_mode)
-    cmds.cycleCheck(evaluation=cycle_check)
-
-    # Display the result
-    msg = "PERFORMANCE TEST\n"
-    msg += "=" * (len(msg) - 1) + "\n\n"
-    for result in results:
-        msg += "\t- {} FPS\n".format(result)
-
-    msg += "\n\tMIN: {} FPS".format(min(results))
-    msg += "\n\tMAX: {} FPS".format(max(results))
-    msg += "\n\n\tAVERAGE: {} FPS".format(round((sum(results) / len(results))))
-
-    LOG.info("\n\n\n%s\n\n\n", msg)
-
-
 @contextlib.contextmanager
-def profile(sort="time", lines=None, strip=False):
-    # type: (str, Optional[int], bool) -> Generator[None, None, None]
+def profile(restrictions=10, sort="time", strip=False):
+    # type: (Union[int, float, str], str, bool) -> Generator[None, None, None]
     """Detail the execution of all statements in the block.
 
     The following are the values accepted by the ``sort`` parameter:
 
     Arguments:
+        restrictions: Limit the list down to the significant entries.
         sort: Sorts the output according to the specified mode.
-        lines: Limits the output to a specified number of lines.
         strip: Removes all leading path information from file name.
     """
     profiler = cProfile.Profile()
@@ -114,7 +34,7 @@ def profile(sort="time", lines=None, strip=False):
     if strip:
         stats.strip_dirs()
     stats.sort_stats(sort)
-    stats.print_stats(lines)
+    stats.print_stats(restrictions)
 
 
 @contextlib.contextmanager

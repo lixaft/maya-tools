@@ -1,27 +1,23 @@
 """IO stream utilities."""
 import contextlib
 import logging
+import os
 import sys
+from typing import Generator
 
-__all__ = ["DummyStream", "silent"]
+__all__ = ["silent"]
 
 LOG = logging.getLogger(__name__)
 
 
-class DummyStream(object):
-    """Dummy file to silent python standard stream."""
-
-    def write(self, _):
-        """Dummy method for stream."""
-
-
 @contextlib.contextmanager
 def silent():
+    # type: () -> Generator[None, None, None]
     """Silent the standard output."""
     stdout = sys.stdout
     try:
-        stream = DummyStream()
-        sys.stdout = stream
+        with open(os.devnull, "a") as stream:
+            sys.stdout = stream
         yield
     finally:
         sys.stdout = stdout

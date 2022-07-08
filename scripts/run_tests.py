@@ -9,6 +9,7 @@ import utilities
 
 
 def test():
+    # type: () -> int
     """Test entry point."""
     from maya import standalone
 
@@ -37,6 +38,7 @@ def test():
 
 
 def main():
+    # type: () -> int
     """CLI entry point."""
     parser = argparse.ArgumentParser()
     parser.add_argument(

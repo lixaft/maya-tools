@@ -1,4 +1,6 @@
 """Test for attribute."""
+from typing import Any, Dict, List
+
 import pytest
 
 from maya import cmds
@@ -36,6 +38,7 @@ import maya_tools.attribute
     ids=["long", "short", "bool", "string", "matrix", "compound", "multi"],
 )
 def test_copy_types(attributes):
+    # type: (List[Dict[str, Any]]) -> None
     """Test to copy simple attribute types."""
     src = cmds.createNode("transform")
     dst = cmds.createNode("transform")
@@ -57,6 +60,7 @@ def test_copy_types(attributes):
 
 
 def test_copy_existing():
+    # type: () -> None
     """Test to copy an attribute that already exists on the destination."""
     src = cmds.createNode("transform")
     dst = cmds.createNode("transform")
@@ -71,6 +75,7 @@ def test_copy_existing():
 
 
 def test_add_separator():
+    # type: () -> None
     """Test to create separator attributes."""
     node = cmds.createNode("transform", name="test")
 
@@ -94,6 +99,7 @@ def test_add_separator():
     ids=["locked", "multi"],
 )
 def test_invalid_reset(attributes):
+    # type: (Any) -> None
     """Test invalid case of the reset function."""
     node = cmds.createNode("transform")
     cmds.setAttr(node + ".translateX", lock=True)
@@ -101,6 +107,7 @@ def test_invalid_reset(attributes):
 
 
 def test_move_attribute():
+    # type: () -> None
     """Test to move an attribute aloung the channel box."""
     node = cmds.createNode("transform")
     cmds.addAttr(node, longName="A")

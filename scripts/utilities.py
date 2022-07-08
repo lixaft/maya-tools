@@ -2,9 +2,11 @@
 import os
 import re
 import sys
+from typing import Optional
 
 
 def find_mayapy(version=None):
+    # type: (Optional[int]) -> Optional[str]
     """Find a mayapy executable path.
 
     Arguments:
@@ -19,7 +21,7 @@ def find_mayapy(version=None):
         "win32": os.path.normpath("C:/Program Files/Autodesk/"),
         "darwin": os.path.normpath("/Applications/Autodesk/"),
         "linux": os.path.normpath("/usr/autodesk/"),
-    }.get(sys.platform)
+    }[sys.platform]
 
     if version is None:
         # Search for the most recent version of maya.

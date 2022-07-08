@@ -1,8 +1,6 @@
 """Internal utilities to manage the functions inside the package."""
-import contextlib
 import functools
 import logging
-import sys
 from typing import Any, Callable, Optional
 
 from maya import cmds
@@ -49,47 +47,3 @@ def with_maya(minimum=None, maximum=None):
         return wrapper
 
     return decorator
-
-
-@contextlib.contextmanager
-def nested_managers(*managers):
-    # pylint: disable=redefined-builtin, broad-except
-    # pylint: disable=consider-using-sys-exit, raising-bad-type
-    """Combine multiple context managers into a single nested context manager.
-
-    This function has been deprecated in favour of the multiple manager form
-    of the with statement.
-
-    The one advantage of this function over the multiple manager form of the
-    with statement is that argument unpacking allows it to be
-    used with a variable number of context managers as follows:
-
-       with nested(*managers):
-           do_something()
-
-    """
-    exits = []
-    vars_ = []
-    exc = (None, None, None)
-    try:
-        for mgr in managers:
-            exit = mgr.__exit__
-            enter = mgr.__enter__
-            vars_.append(enter())
-            exits.append(exit)
-        yield vars_
-    except BaseException:
-        exc = sys.exc_info()
-    finally:
-        while exits:
-            exit = exits.pop()
-            try:
-                if exit(*exc):
-                    exc = (None, None, None)
-            except BaseException:
-                exc = sys.exc_info()
-        if exc != (None, None, None):
-            # Don't rely on sys.exc_info() still containing
-            # the right information. Another exception may
-            # have been raised and caught by an exit method
-            raise (exc[0], exc[1], exc[2])

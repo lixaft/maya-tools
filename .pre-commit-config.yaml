@@ -31,3 +31,5 @@ repos:
     rev: v0.961
     hooks:
       - id: mypy
+        exclude: ^scripts/
+        additional_dependencies: [types-all]
