@@ -6,9 +6,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        - maya: "2020"
-        - maya: "2022"
-        - maya: "2023"
+        include:
+          - maya: "2020"
+          - maya: "2022"
+          - maya: "2023"
 
     container: mottosso/maya:${{ matrix.maya }}
 
