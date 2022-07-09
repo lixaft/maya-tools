@@ -1,11 +1,12 @@
-"""Provide utilities related to curves."""
+"""Curve releated utilities."""
 from __future__ import division
 
 import logging
 from typing import Any, Dict, List, Tuple, Union, cast
 
 from maya import cmds
-from maya.api import OpenMaya
+
+import maya_tools.api
 
 __all__ = [
     "from_points",
@@ -19,7 +20,6 @@ __all__ = [
 
 LOG = logging.getLogger(__name__)
 
-
 Vector = Tuple[float, float, float]
 Cached = List[Union[int, bool, List[float]]]
 
@@ -28,11 +28,12 @@ def get_points(curve, world=False, method="cv"):
     # type: (str, bool, str) -> List[Vector]
     """Query the position of each control points of a curve.
 
-    Its possible to query either ``cv`` and ``ep`` points using the ``method``
-    parameter.
+    The ``method`` parameter controls the type of point used to return
+    positions. It accepts either ``ep`` or ``cv`` as a value.
 
     Examples:
         >>> from maya import cmds
+        >>> _ = cmds.file(new=True, force=True)
         >>> node = cmds.curve(
         ...     point=[(-5, 0, 0), (0, 5, 0), (5, 0, 0)],
         ...     degree=1,
@@ -42,13 +43,13 @@ def get_points(curve, world=False, method="cv"):
         [(-5.0, 0.0, -2.0), (0.0, 5.0, -2.0), (5.0, 0.0, -2.0)]
 
     Arguments:
-        curve (str): The name of the curve node to query.
-        world (bool): Specify on which space the coordinates will be returned.
-        method (str): Which type of points should be queried.
+        curve: The name of the curve node to query.
+        world: Specify on which space the coordinates will be returned.
+        method: Which type of points should be queried.
 
     Returns:
-        list: A two-dimensional array that contains all the positions of the
-        points that compose the curve.
+        A two-dimensional array that contains all the positions of the  points
+        that compose the curve.
     """
     pos = cmds.xform(
         "{}.{}[*]".format(curve, method),
@@ -65,6 +66,9 @@ def get_cached(curve):
     # type: (str) -> Cached
     """Extract the data contained in the .cached attribute.
 
+    This function required a static sha[e (a.k.a no history) in order to
+    return any value.
+
     Examples:
         >>> from maya import cmds
         >>> _ = cmds.file(new=True, force=True)
@@ -76,15 +80,12 @@ def get_cached(curve):
         [1, 2, 0, False, 3, [0, 1, 2], 3, 3, ...]
 
     Arguments:
-        curve (str): The the curve from which the data should be extracted.
+        curve: The the curve from which the data should be extracted.
 
     Returns:
-        list: The curve data as a list.
+        The cached data as a list.
     """
-    sel = OpenMaya.MSelectionList()
-    sel.add(curve + ".cached")
-    plug = sel.getPlug(0)
-
+    plug = maya_tools.api.as_plug(curve + ".cached")
     cmd = [x.strip().split() for x in plug.getSetAttrCmds()[1:-1]]
 
     # Add base.
@@ -116,8 +117,8 @@ def set_cached(curve, value):
         >>> set_cached(curve, data)
 
     Arguments:
-        curve (str): The name of the node on which the data should be applied.
-        value (list): The curve data that will be apply on the node.
+        curve: The name of the node on which the data should be applied.
+        value: The curve data that will be apply on the node.
     """
     cmds.setAttr(curve + ".cached", *value, type="nurbsCurve")
 
@@ -125,6 +126,8 @@ def set_cached(curve, value):
 def from_points(points, name="curve", degree=3, close=False, method="cv"):
     # type: (List[Vector], str, int, bool, str) -> str
     """Create a curve from the given points.
+
+    The curve can be created using two different method: ``cv``  and ``ep``.
 
     Examples:
         >>> from maya import cmds
@@ -182,7 +185,7 @@ def from_transforms(
     If the ``attach`` parameter is set to ``True``, each point of the created
     curve will be driven by the node that gave it its position.
 
-    Its possible to choose between ``ep`` and ``cp`` point to generate the
+    Its possible to choose between ``ep`` and ``ep`` point to generate the
     curve using the ``method`` parameter. For an ``ep`` curve, the ``degree``
     parameter will be ignored.
 
@@ -261,11 +264,11 @@ def from_transforms(
     return curve
 
 
-def replace(old, new):
+def replace(source, destination):
     # type: (str, str) -> None
-    """Replace the shape of the new curve by the one on the old curve.
+    """Replace the shape of the new curve by the one on the old curve.:
 
-    Arguments:
+    Examples:
         >>> from maya import cmds
         >>> _ = cmds.file(new=True, force=True)
         >>> a = cmds.curve(
@@ -277,8 +280,12 @@ def replace(old, new):
         ...     degree=1,
         ... )
         >>> replace(a, b)
+
+    Arguments:
+        source: The name of the curve that should be copied.
+        destination: The name of the curve on which the source will be copied.
     """
-    set_cached(new, get_cached(old))
+    set_cached(destination, get_cached(source))
 
 
 def transform(

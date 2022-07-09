@@ -1,4 +1,4 @@
-"""Windows utilities."""
+"""User interface related utilities."""
 import logging
 from typing import Optional
 
@@ -43,9 +43,9 @@ def toggle_panel_element(element, panel=None):
         False
 
     Arguments:
-        element (str): The UI element to show or hide. This should be a
+        element: The UI element to show or hide. This should be a
             parameter of the :func:`cmds.modelEditor` command, e.g. ``joints``.
-        panel (str, optional): The panel on which toggles the element.
+        panel: The panel on which toggles the element.
             By default, operate on the current panel.
 
     .. _modelEditor:

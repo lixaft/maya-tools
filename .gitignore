@@ -10,6 +10,7 @@
 [Dd]esktop.ini
 __pycache__/
 build/
+coverage*
 dist/
 htmlcov/
 venv/

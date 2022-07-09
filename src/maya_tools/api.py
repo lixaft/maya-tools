@@ -5,13 +5,13 @@ from maya import cmds
 from maya.api import OpenMaya
 
 __all__ = [
-    "as_selection",
-    "as_object",
-    "as_dg",
+    "as_attribute",
     "as_dag",
+    "as_dg",
+    "as_object",
     "as_path",
     "as_plug",
-    "as_attribute",
+    "as_selection",
 ]
 
 LOG = logging.getLogger(__name__)
