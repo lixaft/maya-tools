@@ -1,0 +1,27 @@
+name: Tests
+on: ["push", "pull_request"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        - maya: "2020"
+        - maya: "2022"
+        - maya: "2023"
+
+    container: mottosso/maya:${{ matrix.maya }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Debug environment
+        run: |
+          pwd
+          ls -al
+          mayapy --version
+
+      - name: Setup environment
+        run: |
+          mayapy -m ensurepip --user
