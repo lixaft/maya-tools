@@ -1,6 +1,8 @@
 
-pyYAML
+coverage
 pytest
+pytest-cov
+pyyaml
 six
 typing;python_version < "3"
 webcolors
