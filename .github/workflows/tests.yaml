@@ -1,7 +1,7 @@
 name: Tests
 on: ["push", "pull_request"]
 jobs:
-  build:
+  maya:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -26,3 +26,7 @@ jobs:
       - name: Setup environment
         run: |
           mayapy -m ensurepip --user
+          mayapy -m pip install --user -r dev-requirements.txt
+
+      - name: Run Unittests
+        run: mayapy scripts/run_tests.py -v
