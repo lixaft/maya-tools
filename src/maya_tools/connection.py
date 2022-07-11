@@ -5,14 +5,24 @@ from typing import List, Optional, cast
 from maya import cmds
 from maya.api import OpenMaya
 
-__all__ = ["operation", "matrix_to_srt", "disconnect", "find_related"]
+__all__ = ["double_operation", "matrix_to_srt", "disconnect", "find_related"]
 
 LOG = logging.getLogger(__name__)
 
 
-def operation(plug, operator="*", value=1):
+def double_operation(plug, operator="*", value=1):
     # type: (str, str, float) -> str
-    """Apply on simple operation on the given plug.
+    """Add a simple double operator to the given plug.
+
+    The suported value fo the operator parameter are: ``+`` (add),
+    ``-`` (minus), ``*`` (multiply), ``/`` (divide).
+
+    Examples:
+        >>> from maya import cmds
+        >>> _ = cmds.file(new=True, force=True)
+        >>> node = cmds.createNode("transform", name="A")
+        >>> double_operation(node + ".translateX", operator="+")
+        'A_operation.output'
 
     Arguments:
         plug: The source plug on which the operation will be based.
@@ -20,7 +30,10 @@ def operation(plug, operator="*", value=1):
         value: The second value that will be used for the operation.
 
     Returns:
-        str: The new plug which contain the result of the operation.
+        The new plug which contain the result of the operation.
+
+    Raises:
+        ValueError: An invalid operator as been specified.
     """
     if operator == "*":
         node_type = "multDoubleLinear"
@@ -33,9 +46,10 @@ def operation(plug, operator="*", value=1):
         node_type = "addDoubleLinear"
         value = -value
     else:
-        raise ValueError("Invalid operation '{}'.".format(operation))
+        raise ValueError("Invalid operation '{}'.".format(operator))
 
-    node = cast(str, cmds.createNode(node_type))
+    node = plug.split(".")[0]
+    node = cast(str, cmds.createNode(node_type, name=node + "_operation"))
     cmds.connectAttr(plug, node + ".input1")
     cmds.setAttr(node + ".input2", value)
     return node + ".output"
@@ -59,13 +73,13 @@ def matrix_to_srt(plug, transform, destinations=None):
         'multMatrix1_decomposeMatrix'
 
     Arguments:
-        plug (str): The matrix plud to decompose.
-        transform (str): The name of the transform that recieve the matrix.
-        destinations (list, optional): The name of the attributes on which the
-            matrix will be connected to.
+        plug: The matrix plud to decompose.
+        transform: The name of the transform that recieve the matrix.
+        destinations: The name of the attributes on which the matrix will be
+            connected to.
 
     Returns:
-        str: The name of the decomposeMatrix node use.
+        The name of the decomposeMatrix node use.
     """
     name = plug.split(".", 1)[0] + "_decomposeMatrix"
     decompose = cast(str, cmds.createNode("decomposeMatrix", name=name))
@@ -147,8 +161,8 @@ def find_related(root, node_type, stream="history"):
         stream: The direction in which the search will be performed.
 
     Returns:
-        The name of the first node found. If no node matches the
-            parameters, returns ``None``.
+        The name of the first node found. If no node matches the parameters,
+        returns ``None``.
     """
 
     sel = OpenMaya.MSelectionList().add(root)
