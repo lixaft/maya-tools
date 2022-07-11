@@ -10,26 +10,26 @@ __all__ = ["operation", "matrix_to_srt", "disconnect", "find_related"]
 LOG = logging.getLogger(__name__)
 
 
-def operation(plug, operation="*", value=1):
+def operation(plug, operator="*", value=1):
     # type: (str, str, float) -> str
     """Apply on simple operation on the given plug.
 
     Arguments:
         plug: The source plug on which the operation will be based.
-        operation: The operation type that should be used.
+        operator: The operator type that should be used.
         value: The second value that will be used for the operation.
 
     Returns:
         str: The new plug which contain the result of the operation.
     """
-    if operation == "*":
+    if operator == "*":
         node_type = "multDoubleLinear"
-    elif operation == "/":
+    elif operator == "/":
         node_type = "multDoubleLinear"
         value = 1 / value
-    elif operation == "+":
+    elif operator == "+":
         node_type = "addDoubleLinear"
-    elif operation == "-":
+    elif operator == "-":
         node_type = "addDoubleLinear"
         value = -value
     else:
