@@ -5,9 +5,40 @@ from typing import List, Optional, cast
 from maya import cmds
 from maya.api import OpenMaya
 
-__all__ = ["matrix_to_srt", "disconnect", "find_related"]
+__all__ = ["operation", "matrix_to_srt", "disconnect", "find_related"]
 
 LOG = logging.getLogger(__name__)
+
+
+def operation(plug, operation="*", value=1):
+    # type: (str, str, float) -> str
+    """Apply on simple operation on the given plug.
+
+    Arguments:
+        plug: The source plug on which the operation will be based.
+        operation: The operation type that should be used.
+        value: The second value that will be used for the operation.
+
+    Returns:
+        str: The new plug which contain the result of the operation.
+    """
+    if operation == "*":
+        node_type = "multDoubleLinear"
+    elif operation == "/":
+        node_type = "multDoubleLinear"
+        value = 1 / value
+    elif operation == "+":
+        node_type = "addDoubleLinear"
+    elif operation == "-":
+        node_type = "addDoubleLinear"
+        value = -value
+    else:
+        raise ValueError("Invalid operation '{}'.".format(operation))
+
+    node = cast(str, cmds.createNode(node_type))
+    cmds.connectAttr(plug, node + ".input1")
+    cmds.setAttr(node + ".input2", value)
+    return node + ".output"
 
 
 def matrix_to_srt(plug, transform, destinations=None):
