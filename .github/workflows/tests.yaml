@@ -29,4 +29,4 @@ jobs:
           mayapy -m pip install --user -r dev-requirements.txt
 
       - name: Run Unittests
-        run: python scripts/run_tests.py {{ matrix.maya }} -v
+        run: python3 scripts/run_tests.py {{ matrix.maya }} -v
