@@ -21,6 +21,7 @@ def find_mayapy(version=None):
         "win32": os.path.normpath("C:/Program Files/Autodesk/"),
         "darwin": os.path.normpath("/Applications/Autodesk/"),
         "linux": os.path.normpath("/usr/autodesk/"),
+        "linux2": os.path.normpath("/usr/autodesk/"),
     }[sys.platform]
 
     if version is None:
