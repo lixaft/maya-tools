@@ -143,4 +143,6 @@ def nice(name):
     Returns:
         The generated nice name.
     """
-    return re.sub(r"(?<!^)([A-Z])", r" \1", name).replace("_", " ").title()
+    return re.sub(
+        r"[_-]", r" ", re.sub(r"(?<!^)([A-Z])", r" \1", name)
+    ).title()

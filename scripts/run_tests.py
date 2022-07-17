@@ -22,9 +22,9 @@ def test():
     os.chdir(root)
 
     argv = [
-        "src",
+        # "src",
         "tests",
-        "--doctest-modules",
+        # "--doctest-modules",
         "--cov=src",
         "--cov-report=term",
         "--cov-report=html",
