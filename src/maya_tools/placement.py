@@ -5,9 +5,10 @@ import logging
 from typing import List
 
 from maya import cmds
+
 import maya_tools.api
 
-__all__ = []
+__all__ = ["distribute"]
 
 LOG = logging.getLogger(__name__)
 
