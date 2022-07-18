@@ -2,6 +2,7 @@
 import os
 import re
 import sys
+from typing import Optional
 
 
 def find_mayapy(version=None):

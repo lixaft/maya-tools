@@ -189,3 +189,41 @@ def get_matrix(name):
     """
     matrix = cmds.xform(name, query=True, matrix=True, worldSpace=True)
     return OpenMaya.MMatrix(matrix)
+
+
+def get_transformation_matrix(name):
+    # type: (str) -> OpenMaya.MTransformMatrix
+    """Get the MTransformationMatrix associated to the given name.
+
+    Examples:
+        >>> from maya import cmds
+        >>> _ = cmds.file(new=True, force=True)
+        >>> get_transformation_matrix(cmds.polySphere()[0])
+        maya.api.OpenMaya.MTransformationMatrix(...)
+
+    Arguments:
+        name: The name of the object to query.
+
+    Returns:
+        The MTransformationMatrix instance where the given node is located.
+    """
+    return OpenMaya.MTransformationMatrix(get_matrix(name))
+
+
+def get_point(name):
+    # type: (str) -> OpenMaya.MPoint
+    """Get the MPoint associated to the given name.
+
+    Examples:
+        >>> from maya import cmds
+        >>> _ = cmds.file(new=True, force=True)
+        >>> get_point(cmds.polySphere()[0])
+        maya.api.OpenMaya.MPoint(...)
+
+    Arguments:
+        name: The name of the object to query.
+
+    Returns:
+        The MPoint instance where the given node is located.
+    """
+    return get_transformation_matrix(name).translation(OpenMaya.MSpace.kWorld)
